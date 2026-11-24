@@ -125,7 +125,7 @@ function paintWave() {
     const height = 3 + 39 * peak;
     for (const [key, value] of Object.entries({
       x: index * 660 / peaks.length, y: (44 - height) / 2,
-      width: Math.min(2.5, 420 / peaks.length), height, rx: 1.25, fill: "#bfdacf",
+      width: Math.min(2.5, 420 / peaks.length), height, rx: 1.25,
     })) rect.setAttribute(key, value);
     wave.append(rect);
   }
@@ -147,7 +147,7 @@ function syncAudio() {
   $("head").style.left = Math.min(100, ratio * 100) + "%";
   const bars = $("wave").children;
   Array.from(bars).forEach((bar, index) => {
-    bar.setAttribute("fill", index / bars.length < ratio ? "#ffc1a7" : "#bfdacf");
+    bar.classList.toggle("played", index / bars.length < ratio);
   });
   if (!audio.paused && !editing && !review) {
     if (endPlayback !== null && seconds >= endPlayback) {
@@ -498,6 +498,10 @@ audio.addEventListener("pause", () => {
   $("play").classList.remove("pause");
   $("play").setAttribute("aria-label", "播放");
 });
+audio.addEventListener("playing", () => $("player").classList.add("is-playing"));
+for (const event of ["pause", "waiting", "ended", "emptied", "error"]) {
+  audio.addEventListener(event, () => $("player").classList.remove("is-playing"));
+}
 
 $("play").onclick = () => { endPlayback = null; audio.paused ? play() : audio.pause(); };
 $("speed").onchange = () => { audio.playbackRate = Number($("speed").value); };
