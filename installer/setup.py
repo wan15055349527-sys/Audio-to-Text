@@ -135,7 +135,9 @@ def install(target, desktop, report, *, make_shortcut=True, old_target=None):
     data = DATA.resolve()
     if resolved == Path(resolved.anchor) or resolved == data or resolved in data.parents or data in resolved.parents:
         raise ValueError("请选择独立的程序目录，不能使用根目录或稿件数据目录。")
-    if target.exists() and not owned_folder(target):
+    if target.is_symlink() or target.is_junction():
+        raise ValueError("请选择实际文件夹。")
+    if target.exists() and not owned_folder(target) and (not target.is_dir() or any(target.iterdir())):
         raise FileExistsError("安装目录已有其他内容。请移走该目录后再试。")
     suffix = uuid4().hex
     stage = target.with_name(".tg-new-" + suffix[:10])
