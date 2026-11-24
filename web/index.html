@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>听稿</title>
+<link rel="stylesheet" href="desk.css">
+<script src="desk.js" defer></script>
+</head>
+<body>
+<main class="app" id="app"><header class="topbar"><div class="brand"><span class="logo"><i></i><i></i><i></i><i></i></span>听稿</div><span class="label">离线转写</span></header><aside class="side"><button class="primary" id="addSide">＋　导入文件</button><div class="queue"><div class="label">文件队列</div><div id="files"></div></div><button class="home" id="home">返回导入页</button></aside><section class="main" id="scroller"><div class="wrap"><header class="bar"><span class="brandM" id="crumb">本地工作台</span><select id="mobile" aria-label="切换文件" class="mobileQueue"></select><div class="barActions">
+    <div id="toolbar" hidden>
+      <select id="language" class="outline" aria-label="识别语言">
+        <option value="">自动识别语言</option><option value="zh">中文</option><option value="en">英语</option>
+        <option value="es">西班牙语</option><option value="ja">日语</option><option value="ko">韩语</option>
+        <option value="fr">法语</option><option value="de">德语</option><option value="pt">葡萄牙语</option>
+      </select>
+      <button class="primary" id="begin">开始转写</button>
+    </div><div class="exportBox" id="exportBox" hidden><button class="outline" id="exportBtn" aria-expanded="false">导出稿件 ↓</button><div class="menu" id="menu" hidden><button data-f="txt">纯文本 TXT</button><button data-f="srt">字幕 SRT</button></div></div></div></header>
+<div class="welcome" id="welcome">
+  <div class="entry-copy">
+    <h1>把音视频转成文字</h1>
+    <p>拖入音频或视频，在本机转写、回听和校对。</p>
+    <button class="primary" id="addMain">选择文件 <span aria-hidden="true">→</span></button>
+    <p class="entry-note">支持 MP3、WAV、M4A、MP4、MOV 等格式</p>
+  </div>
+  <section class="example" aria-labelledby="example-title">
+    <div class="example-title">
+      <h2 id="example-title">雨后的街道</h2>
+      <span>示例稿 · 01:29</span>
+    </div>
+    <div class="example-audio" aria-hidden="true">
+      <div id="example-wave"></div>
+      <div class="example-time"><span>00:09</span><span>01:29</span></div>
+    </div>
+    <div class="example-quote">
+      <p>我想把这段声音留下来。你听，先是一辆自行车经过……</p>
+    </div>
+    <button class="link example-open" id="sample">打开示例稿，试试回听 <span aria-hidden="true">→</span></button>
+  </section>
+</div>
+<p id="toast" class="toast" role="status" hidden></p><article id="desk" hidden><header class="title"><h1 id="name"></h1><p id="meta"></p></header><div class="player" id="player"><div class="playTop"><button class="round" id="play" aria-label="播放"><i class="triangle"></i></button><strong>原声回听</strong><span class="clock" id="clock"></span><select id="speed" aria-label="播放速度"><option value="1">1.0×</option><option value="0.8">0.8×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select></div><div class="track"><svg id="wave" viewBox="0 0 660 44" preserveAspectRatio="none" aria-hidden="true"></svg><div class="head" id="head"></div><input type="range" id="seek" aria-label="播放位置" min="0" step="0.01" value="0"></div></div><section class="doc"><div class="docHead"><h2>转写稿</h2><small id="state" role="status"></small></div><div id="task"></div><div id="rows"></div><div class="notice" id="note"></div></section></article></div></section></main><audio id="audio" preload="metadata"></audio><input id="picker" type="file" multiple accept="audio/*,video/*,.mp3,.mp4,.m4a,.wav,.ogg,.webm" hidden>
+</body></html>
