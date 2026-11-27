@@ -11,7 +11,7 @@ import time
 
 from engines import RATE, Cancelled, Engines, check_cancelled, decode, waveform, write_preview
 
-LANGUAGES = {"", "zh", "en", "es", "ja", "ko", "fr", "de", "pt"}
+LANGUAGES = {"", "zh", "zh-accurate", "en", "es", "ja", "ko", "fr", "de", "pt"}
 ACTIVE = {"queued", "working", "stopping"}
 
 

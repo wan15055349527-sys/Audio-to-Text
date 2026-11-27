@@ -90,6 +90,12 @@ function renderQueue() {
   const home = new Option("导入页", "home");
   $("mobile").replaceChildren(home, ...items.map(job => new Option(job.name, job.id)));
   $("mobile").value = current?.id || "home";
+  const recent = $("recent");
+  recent.hidden = Boolean(current) || jobs.length === 0;
+  const hint = new Option("最近稿件", "");
+  hint.disabled = true;
+  recent.replaceChildren(hint, ...[...jobs].reverse().map(job => new Option(job.name, job.id)));
+  recent.value = "";
   $("toolbar").hidden = !jobs.some(job => startable.has(job.status)) || !current;
 }
 
@@ -520,6 +526,9 @@ $("picker").onchange = event => {
   event.target.value = "";
 };
 $("mobile").onchange = event => event.target.value === "home" ? showHome() : openJob(event.target.value);
+$("recent").onchange = event => {
+  if (event.target.value) openJob(event.target.value);
+};
 $("begin").onclick = () => {
   const ready = jobs.filter(job => job.status === "ready");
   startJobs((ready.length ? ready : jobs.filter(job => startable.has(job.status))).map(job => job.id));

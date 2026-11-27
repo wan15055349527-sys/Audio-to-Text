@@ -2,11 +2,12 @@
 
 import os
 from pathlib import Path
-from threading import Lock
+from threading import Event, Lock
 
 import av
 import numpy as np
 from faster_whisper import WhisperModel
+from faster_whisper.vad import VadOptions, get_speech_timestamps
 import sherpa_onnx
 
 RATE = 16000
@@ -76,6 +77,8 @@ class Engines:
         self.review_lock = Lock()
 
     def transcribe(self, audio, language, stop, report):
+        if language == "zh-accurate":
+            return self.transcribe_mandarin(audio, stop, report), "zh"
         if self.whisper is None:
             folder = self.models / "whisper-base"
             if not (folder / "model.bin").is_file():
@@ -98,9 +101,7 @@ class Engines:
             report(min(.99, end / duration))
         return rows, info.language
 
-    def review(self, preview, start, end):
-        from threading import Event
-
+    def recognize_mandarin(self, audio):
         with self.review_lock:
             if self.paraformer is None:
                 folder = self.models / "paraformer"
@@ -111,12 +112,29 @@ class Engines:
                     tokens=str(folder / "tokens.txt"),
                     sample_rate=RATE, num_threads=THREADS,
                 )
-            audio = decode(preview, Event())
-            section = audio[round(start * RATE):round(end * RATE)]
-            if not section.size:
-                raise ValueError("这个片段没有可复核的声音。")
             reader = self.paraformer.create_stream()
-            reader.accept_waveform(RATE, section)
+            reader.accept_waveform(RATE, audio)
             self.paraformer.decode_stream(reader)
             return reader.result.text.strip()
+
+    def transcribe_mandarin(self, audio, stop, report):
+        check_cancelled(stop)
+        options = VadOptions(max_speech_duration_s=16, min_silence_duration_ms=430, speech_pad_ms=200)
+        periods = get_speech_timestamps(audio, options, sampling_rate=RATE)
+        rows = []
+        for period in periods:
+            check_cancelled(stop)
+            start, end = period["start"], period["end"]
+            text = self.recognize_mandarin(audio[start:end])
+            if text:
+                rows.append({"start": start / RATE, "end": end / RATE, "text": text})
+            report(min(.99, end / audio.size))
+        return rows
+
+    def review(self, preview, start, end):
+        audio = decode(preview, Event())
+        section = audio[round(start * RATE):round(end * RATE)]
+        if not section.size:
+            raise ValueError("这个片段没有可复核的声音。")
+        return self.recognize_mandarin(section)
 
